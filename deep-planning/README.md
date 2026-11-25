@@ -1,0 +1,30 @@
+# deep-planning
+
+> Mode-based router for any complex planning exercise prior to executing. Three modes (Quick / Build / Strategic) calibrate ordering, skill selection, and Compound Engineering integration to the intent and complexity of the work. Replaces /spec-writer (hard-retired 2026-05-08). Use when the user says "spec out X", "design the system for X", "let's plan X properly", "scope this sub-project", "evaluate", "explore", "from scratch", "rethink", or returns to an in-progress /project-create with non-trivial complexity.
+
+**Version:** 0.4.0
+
+## Installation
+
+This skill ships as part of **cc-starter-pack**. Install the pack, not the skill:
+
+```bash
+git clone --depth 1 --branch v1.0.0 https://github.com/AI-Acceleration/cc-starter-pack.git
+cd cc-starter-pack
+./install.sh
+```
+
+**Updating an existing install:** a plain `./install.sh` **skips** every skill you already have and reports nothing wrong, so an update silently does nothing. Run `./install.sh force` to overwrite your copies with the current versions.
+
+## Usage
+
+Invoke in Claude Code:
+
+```
+/deep-planning topic description (short sentence of what to plan)
+```
+
+## Files
+
+- `SKILL.md`
+
