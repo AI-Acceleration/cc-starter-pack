@@ -2,14 +2,14 @@
 
 > A Claude Code skill.
 
-**Version:** 0.0.1
+**Version:** 0.4.1
 
 ## Installation
 
 This skill ships as part of **cc-starter-pack**. Install the pack, not the skill:
 
 ```bash
-git clone --depth 1 --branch v1.0.0 https://github.com/AI-Acceleration/cc-starter-pack.git
+git clone --depth 1 --branch v1.0.1 https://github.com/AI-Acceleration/cc-starter-pack.git
 cd cc-starter-pack
 ./install.sh
 ```

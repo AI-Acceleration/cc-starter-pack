@@ -1,7 +1,7 @@
 ---
-name: context
-version: "0.0.2"
-description: Show current context window usage and session information
+name: load-context
+version: "0.0.3"
+description: Estimate how full the context window is, list what the session has covered, and say whether to compact. Use when the user asks how much context is left or whether to compact. For exact token counts, Claude Code's built-in /context command is the source.
 ---
 <!-- ported-from: context@0.0.2 sha256:cbd674353fba deliberate:personal-only -->
 

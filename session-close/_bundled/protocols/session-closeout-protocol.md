@@ -104,14 +104,14 @@ If this was a Programming Projects session and code was written or modified:
 2. Commit any simplification changes separately (e.g., "Simplify: clean up session changes").
 3. If no code was changed this session, skip this step.
 
-### 4. Permission Review (lightweight)
+### 4. Permission Note (lightweight, observe only)
 
-Before ending the session, briefly review which tool permissions the user had to manually authorize:
+Optionally, mention which commands or tools prompted for permission often during the session — patterns, not every individual approval. That is all this step does:
 
-- List the notable permissions that were prompted during the session (file edits, Bash commands, new tool types) — focus on patterns, not every individual approval.
-- Ask if any should be pre-authorized for future sessions.
-- If the user approves, update the project-level `.claude/settings.json` (preferred for project-scoped rules) or `~/.claude/settings.json` (for global rules).
-- For the full permission reference table and risk guidance, see the permissions step of your retrospective protocol (e.g. `retrospective-protocol.md`, if you maintain one).
+- **Never edit, open or print any settings file** (`.claude/settings.json`, `.claude/settings.local.json`, `~/.claude/settings.json`, or any other), and never add, change or remove a permission rule yourself — not even when the user approves.
+- If the user wants a lasting rule, tell them to add **one exact rule themselves** through Claude Code's built-in `/permissions` screen, naming the specific command that kept prompting.
+- Warn against broad wildcard rules (a bare `Bash`, `Read`, `Edit`, `Write` or `WebFetch`, or a pattern like `Bash(git *)`): they approve far more than the one command that prompted, including commands that delete files or reach the network.
+- Prompts are a safety check, not friction to remove. Saying nothing here is fine; this step never blocks the close.
 
 ### 4.5. Update Lessons Log
 

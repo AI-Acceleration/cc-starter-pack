@@ -1,6 +1,6 @@
 ---
 name: session-close
-version: "0.4.0"
+version: "0.4.1"
 description: Close out a session — invoke when user says "close out", "wrap up", "done for now", "save state", "closing out", "end session", "let's close", or similar. Updates project briefs, Area MOCs, Program briefs, contact cards, and Agendas; enforces brief structural hygiene (moves completed items out of Next Actions into the Log, dedups tasks, consolidates Continuation Prompts) and reconciles open Next Actions against reality with evidence-cited staleness probes (propose-only); runs infrastructure drift check, skill codification scan (atomic + composite), INBOX sweep for session-generated files, and retro evaluation.
 user-invocable: true
 argument-hint: "optional: project name or scope hint"
@@ -33,7 +33,7 @@ If this is the **second or later completed invocation** of `/session-close` for 
    - Always re-run Phase 2.5 (Infrastructure Version Control) — the working tree may have changed since the first pass (e.g., new commits landed, files pushed).
    - Always re-run Phase 3 (Retro evaluation) — scoring is cheap and the user may have new context.
    - **Always re-evaluate the Phase 0.6 impact list** — add any project worked on or directly affected since the first close and give it its own Phase 1 update. If the list grew, re-run Phase 2c too; an unchanged list makes 2c a logged no-op.
-   - **Skip** Phase 0 (Deep Work), Phase 1 cross-linking, Phase 1 permission review, Phase 1 agent-runtime infrastructure check, Phase 2b Area MOCs, Phase 2c vault index sync (unless the impact list grew — see above), Phase 2.4 contact sync, and Phase 2.7 skill codification — none of these change on a second pass in the same conversation.
+   - **Skip** Phase 0 (Deep Work), Phase 1 cross-linking, Phase 1 permission note, Phase 1 agent-runtime infrastructure check, Phase 2b Area MOCs, Phase 2c vault index sync (unless the impact list grew — see above), Phase 2.4 contact sync, and Phase 2.7 skill codification — none of these change on a second pass in the same conversation.
    - **Conditionally re-run** Phase 1 brief updates and Phase 1 lessons.md — only if the user did something between the two invocations (committed code, ran a command, made a decision). If nothing changed, just report "no delta, everything from first pass still holds."
 3. **Announce the fast path** at the start: "Second `/session-close` in this conversation — running delta-only mode. Phases X/Y/Z skipped (already ran first pass), phases A/B re-running because state may have changed."
 
@@ -147,7 +147,7 @@ Apply Phase 1 and its brief/Continuation-Prompt checks to each worked or directl
 Read and follow `./_bundled/protocols/session-closeout-protocol.md` (the bundled copy shipped with this skill), or your own customized copy at `{{AGENT_DIR}}/session-closeout-protocol.md` if you maintain one. Execute all steps:
 - Identify and update the vault project brief (continuation prompt, next actions, log, waiting for, working notes)
 - Cross-linking
-- Permission review
+- Permission note (observe only: never edit, open or print a settings file or add a permission rule; a user who wants a lasting rule adds one exact rule themselves via the built-in `/permissions` screen)
 - Lessons log update
 - Cross-pollination check
 
@@ -785,7 +785,7 @@ Acknowledge and close out. The session closeout from Phase 1 is already complete
 
 - **shared-node [[people-resolver]]** — resolves names to contact cards silently during Phase 2.4 contact sync (mode: silent). Location: `{{AGENT_DIR}}/skills/_shared/nodes/people-resolver.md`. Fallback via [[Shared Node Bundling]]: `./_bundled/nodes/people-resolver.md`.
 - **shared-node [[brief-updater]]** — updates project brief Log + Continuation Prompt during Phase 1 (modes: log-entry, continuation-prompt). Location: `{{AGENT_DIR}}/skills/_shared/nodes/brief-updater.md`. Fallback: `./_bundled/nodes/brief-updater.md`.
-- **protocol-doc session-closeout-protocol.md** — defines the canonical session-closeout flow that Phase 1 follows verbatim (brief identification, cross-linking, permission review, lessons log, cross-pollination). Path: `{{AGENT_DIR}}/session-closeout-protocol.md` (or wherever you keep shared protocol docs). For starter-pack members: ship a bundled copy at `./_bundled/protocols/session-closeout-protocol.md`.
+- **protocol-doc session-closeout-protocol.md** — defines the canonical session-closeout flow that Phase 1 follows verbatim (brief identification, cross-linking, permission note, lessons log, cross-pollination). Path: `{{AGENT_DIR}}/session-closeout-protocol.md` (or wherever you keep shared protocol docs). For starter-pack members: ship a bundled copy at `./_bundled/protocols/session-closeout-protocol.md`.
 - **cli git** — Phase 2.5 Infrastructure Version Control drift detection in the `{{AGENT_DIR}}` repo. Install: pre-installed on macOS, otherwise `xcode-select --install` (macOS) or https://git-scm.com (Windows). Phase 2.5 gracefully skips if no `.git` directory is present (silent skip, not a failure).
 - **cli jq** — Phase 1 session-log.ndjson append uses `jq -n` to construct the JSON record. Install: `brew install jq` (macOS), `choco install jq` or `winget install jqlang.jq` (Windows), or https://jqlang.github.io/jq/download/.
 

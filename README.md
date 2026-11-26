@@ -1,10 +1,10 @@
 # cc-starter-pack
 
-Curated Claude Code skills for members of the **AI Acceleration Club**. Eleven skills that bootstrap you into productive workflow patterns from day one — no paid API keys, minimal setup, and every dependency explicitly declared.
+Curated Claude Code skills for members of the **AI Acceleration Club**. Nine skills that bootstrap you into productive workflow patterns from day one — no paid API keys, minimal setup, and every dependency explicitly declared.
 
 This is **Tier A+** of the Member Starter-Pack Initiative. Tier B (14 additional skills including `/meeting-minutes`, `/last30days`, `/weekly-review`) ships after Tier A proves out.
 
-> **Used by the AIAC Facilitator Pack.** This is the starter skills pack that the [AIAC Facilitator Pack](https://github.com/AI-Acceleration/aiac-facilitator-pack) installs during participant setup. The kit pins it by **tag** (currently `v1.0.0`), never by branch, so a kit run always gets the same files. Raw file URLs take the form `https://raw.githubusercontent.com/AI-Acceleration/cc-starter-pack/v1.0.0/<path>`. New versions ship as new tags; existing tags are never moved.
+> **Used by the AIAC Facilitator Pack.** This is the starter skills pack that the [AIAC Facilitator Pack](https://github.com/AI-Acceleration/aiac-facilitator-pack) installs during participant setup. The kit pins it by **tag** (currently `v1.0.1`), never by branch, so a kit run always gets the same files. Raw file URLs take the form `https://raw.githubusercontent.com/AI-Acceleration/cc-starter-pack/v1.0.1/<path>`. New versions ship as new tags; tags are never moved or re-pointed, so `v1.0.0` still resolves to its original files. See [`CHANGELOG.md`](CHANGELOG.md) for what changed between tags.
 
 ---
 
@@ -13,16 +13,16 @@ This is **Tier A+** of the Member Starter-Pack Initiative. Tier B (14 additional
 | Skill | Purpose | External Setup |
 |---|---|---|
 | **`/session-close`** | Close sessions cleanly — update project briefs, run retro eval, log state for cross-session recovery | `git` + `jq` |
-| **`/context`** | Show current context window usage and flag when to compact | — |
-| **`/permissions`** | Display Claude Code permission configuration from your settings.json files | — |
+| **`/load-context`** | Estimate context window usage, list the session's topics, and flag when to compact (Claude Code's built-in `/context` shows exact numbers) | — |
 | **`/retro`** | Run a retrospective routed by session mode (Programming or Vault Management) | — |
-| **`/extract`** | Smart-fetch URL or vault-embed content and generate structured extractions | — |
 | **`/skill-create`** | Guided interactive creation of new Claude Code skills | — |
 | **`/project-create`** | Create a Project or Program brief with research, Q&A, and cross-linking | — |
 | **`/deep-research`** | Four-phase research pipeline: broad sweep → deep dive → synthesis → brief | — |
 | **`/deep-planning`** | Mode-based planning pipeline (Quick / Build / Strategic) that orchestrates brainstorm → plan before you build | Superpowers + Compound Engineering plugins; `/last30days` optional |
 | **`/fermi-decomposition`** | Break "immeasurable" quantities into estimable factors (market sizing, cost/deal estimation) — *How To Measure Anything* method | — |
 | **`/inbox-clear`** | Clear your inbox with the GTD decision tree — classify every item, approve each move by checkbox | — |
+
+No skill in this pack edits, opens or prints your Claude Code settings files, adds permission rules, reads credentials, or tells Claude to skip permission prompts. If you want a lasting permission rule, add one exact rule yourself through Claude Code's built-in `/permissions` screen.
 
 Every `SKILL.md` in this repo declares its dependencies per the [Skill Dependencies Declaration convention](#dependencies-convention). Open any SKILL.md and scroll to `## Dependencies` to see exactly what the skill needs, what's optional, and what it explicitly does **not** require.
 
@@ -33,7 +33,7 @@ Every `SKILL.md` in this repo declares its dependencies per the [Skill Dependenc
 ### Option A — Copy (recommended)
 
 ```bash
-git clone --depth 1 --branch v1.0.0 https://github.com/AI-Acceleration/cc-starter-pack.git
+git clone --depth 1 --branch v1.0.1 https://github.com/AI-Acceleration/cc-starter-pack.git
 cd cc-starter-pack
 ./install.sh
 ```
@@ -54,7 +54,11 @@ Later, `cd ~/cc-starter-pack && git pull` updates all skills in place. This opti
 
 Copy any individual skill directory into `~/.claude/skills/<skill-name>/`. No install script required.
 
-After any install method: **restart Claude Code**, then verify with `/context` — if it runs, you're set.
+### Upgrading from v1.0.0
+
+A plain `./install.sh` skips every skill you already have, so run `./install.sh force` to pick up the updated `session-close` and `retro`. v1.0.1 dropped `extract` and `permissions` and renamed `context` to `load-context`; the installer never deletes them, it only prints a note if it finds them in `~/.claude/skills/`. Delete those folders yourself if you no longer want them. See [`CHANGELOG.md`](CHANGELOG.md).
+
+After any install method: **restart Claude Code**, then verify with `/load-context` — if it runs, you're set.
 
 ---
 
@@ -73,17 +77,16 @@ If `jq` is absent, `/session-close` still runs — it just skips appending to th
 
 ### All other skills work out of the box
 
-`/context`, `/permissions`, `/retro`, `/extract`, `/skill-create`, `/project-create`, `/deep-research` depend only on Claude Code's built-in tools (Read, Write, Edit, WebSearch, WebFetch, Grep, Glob, Bash, AskUserQuestion).
+`/load-context`, `/retro`, `/skill-create`, `/project-create`, `/deep-research` depend only on Claude Code's built-in tools (Read, Write, Edit, WebSearch, WebFetch, Grep, Glob, Bash, AskUserQuestion).
 
 ---
 
 ## Vault-Aware Skills (Optional Context)
 
-Four skills reference a **PARA-style Obsidian vault** (`Projects/`, `Areas/`, `Resources/`, `Archives/`, `Inbox/`):
+Three skills reference a **PARA-style Obsidian vault** (`Projects/`, `Areas/`, `Resources/`, `Archives/`, `Inbox/`):
 
 - `/session-close` — updates project briefs, Area MOCs, Program briefs
 - `/retro` — reads protocol files from your vault's Claude Code resources folder (see `retro/SKILL.md` for the exact path convention)
-- `/extract` — searches vault for connections; URL-mode writes to your inbox folder
 - `/project-create` — writes drafts to your inbox folder, commits to `Projects/`
 
 **If you did the Phase 0 Obsidian vault setup**, the vault paths resolve automatically and these skills run end-to-end.
@@ -91,7 +94,6 @@ Four skills reference a **PARA-style Obsidian vault** (`Projects/`, `Areas/`, `R
 **If you don't have the vault set up**, the skills still run but degrade gracefully:
 - `/session-close` skips vault-specific phases (brief updates, Area MOCs, inbox sweep) and only runs the mode-agnostic parts (Deep Work detection, session log, retro evaluation).
 - `/retro` falls back to its `_bundled/protocols/` copies of the retrospective protocols (included in this repo).
-- `/extract` skips vault-connection search but still fetches URLs and generates extractions.
 - `/project-create` writes drafts to wherever you run it from.
 
 The `_bundled/protocols/` directories inside `/session-close/` and `/retro/` contain local copies of the canonical vault protocol docs, so those two skills don't hard-break in a vaultless environment.
@@ -118,7 +120,6 @@ Reading any SKILL.md tells you exactly what it needs — no cross-referencing, n
 Most skills are a single `SKILL.md` file. A few ship with bundled dependency fallbacks:
 
 - **`session-close/`** — SKILL.md + `_bundled/nodes/` (brief-updater.md, people-resolver.md) + `_bundled/protocols/` (session-closeout-protocol.md)
-- **`extract/`** — SKILL.md + `_bundled/nodes/` (smart-fetch.md, vault-index-loader.md)
 - **`retro/`** — SKILL.md + `_bundled/protocols/` (retrospective-protocol.md, vault-self-improvement-protocol.md)
 
 The `_bundled/` directories follow the "vault → bundled → skip" resolution pattern — Claude Code tries the vault path first, falls back to the bundled copy if the vault isn't set up, and skips gracefully if neither is available.

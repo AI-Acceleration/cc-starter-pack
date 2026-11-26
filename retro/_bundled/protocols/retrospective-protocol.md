@@ -35,7 +35,7 @@ When a retrospective is approved:
 
 5. **Route with leanness in mind — CLAUDE.md is the last resort.** For each proposal that passed grading, pick the leanest sink that works. Preferred routing, in order:
    1. **Skill / plugin / command** — if the behavior can be encoded as a workflow step, extend the relevant skill or propose a new one. This scales with domain, not surface area.
-   2. **Hook** — if the rule is a deterministic pre/post check (credential scan, git safety, format enforcement), propose a hook in `CLAUDE CODE RESOURCES/hooks/` or `~/.claude/hooks/`.
+   2. **Hook** — if the rule is a deterministic pre/post check (credential scan, git safety, format enforcement), propose a hook in `CLAUDE CODE RESOURCES/hooks/` or `~/.claude/hooks/`. A hook proposal is text only: registering a hook means changing a settings file, which you never do — describe the hook and let the user add it themselves through Claude Code's built-in `/hooks` screen if they want it.
    3. **`notes/lessons.md`** (project-local) — the default sink for anything that's real but narrow. Lessons accumulate freely here with no leanness bar.
    4. **Convention file** in your shared conventions folder — for cross-project behaviors that need more than 3 sentences. Referenced from CLAUDE.md via the trigger table, not inlined.
    5. **Project-level `CLAUDE.md`** (e.g., `<project-name>/CLAUDE.md`) — moderate bar. Project files may carry domain-specific rules that wouldn't survive the top-level grading gate. A recurring project-specific pattern earns its spot here.
@@ -45,7 +45,7 @@ When a retrospective is approved:
 
 6. Categorize each surviving proposal by target file:
    - `[GEN]` → top-level `Programming Projects/CLAUDE.md` (only if it cleared step 5's top-level bar)
-   - `[CLAUDE]` → Claude-specific tooling adjustment (settings, hooks, skills)
+   - `[CLAUDE]` → Claude-specific tooling adjustment (hooks, skills; any settings change is the user's to make — see step 14)
    - `[PROJECT:<name>]` → project-specific rule for that project's CLAUDE.md
    - `[CONVENTION:<name>]` → new or amended convention file
    - `[SKILL:<name>]` → skill extension or new skill
@@ -64,31 +64,11 @@ When a retrospective is approved:
 11. **Review the canonical CLAUDE.md for clarity:** Remove redundant instructions, fix inconsistencies, simplify confusing wording, and tighten formatting. This is a leanness sweep — if a bullet has grown stale or its failure mode hasn't recurred in 6+ months, flag it for removal.
 12. **Update the user's Workflow doc:** If the retrospective surfaced tips or reminders, append them to the `Retrospective Inbox` section of `Claude Code Workflow.md`. Format: `### YYYY-MM-DD — <project>` followed by bullets.
 13. **Cross-pollination check.** Review the sibling Vault Management CLAUDE.md for any recently added general rules or patterns worth porting. Propose — never auto-apply. Apply the same grading + routing discipline: don't port a rule into a top-level CLAUDE.md unless it clears the bar.
-14. **Permission review.** Recall which tool permissions the user had to manually authorize during the session (Bash commands, file edits, web fetches, MCP tools, etc.). For each:
-    - State the permission and what it allows (use the reference table below).
-    - Explain the risk level of pre-authorizing it — distinguish between scoped rules (e.g., `Bash(npm run *)`) and blanket rules (e.g., `Bash`).
-    - Recommend scoped rules where possible. Warn against blanket pre-authorization of `Bash`, `Edit`, or `WebFetch` without specifiers.
-    - Ask the user if they'd like to add any of these to their permissions settings (`~/.claude/settings.json` for global, or `.claude/settings.json` in the project for project-scoped).
-    - If the user approves, make the edits to the appropriate settings file.
-
-### Permission Reference (for step 14)
-
-| Permission | What it allows | Risk if blanket-authorized |
-|---|---|---|
-| `Bash(command pattern)` | Run shell commands matching the pattern. `*` is wildcard. Word boundaries matter: `Bash(ls *)` ≠ `Bash(ls*)`. | **High.** Blanket `Bash` allows *any* shell command — file deletion, network access, credential exfiltration. Always scope to specific commands. |
-| `Read(path pattern)` | Read files matching the glob pattern. Supports `*`, `**`, `~`, `//absolute`. | **Medium.** Blanket `Read` exposes `.env`, `.ssh/`, secrets, credentials. Scope to source directories. |
-| `Edit(path pattern)` | Modify files matching the glob pattern. Same glob syntax as Read. | **Medium-High.** Blanket `Edit` allows modifying configs, injecting code, altering build scripts. Scope to source directories. |
-| `Write(path pattern)` | Create new files matching the glob pattern. | **Medium.** Similar to Edit — can create files in unexpected locations. Scope to project directories. |
-| `WebFetch(domain:example.com)` | Fetch content from matching domains. | **Low-Medium.** Blanket `WebFetch` allows accessing any URL including internal services. Scope to known domains. |
-| `mcp__server__tool` | Use a specific MCP tool. `mcp__server__*` allows all tools from that server. | **Varies.** Depends on what the MCP server can do (e.g., Google Workspace tools can send emails, modify files). Prefer per-tool rules. |
-| `Task(agent_type)` | Spawn subagents of a given type. | **Low.** Subagents inherit the session's permission mode. Rarely needs pre-authorization. |
-
-**Scoped vs. blanket examples:**
-- Safe: `Bash(python manage.py *)`, `Bash(bun run *)`, `Bash(git commit *)`, `Edit(src/**/*.ts)`
-- Risky: `Bash`, `Edit`, `Read`, `WebFetch` (no specifiers = everything allowed)
-- Deny patterns protect sensitive paths: `Read(.env*)`, `Read(~/.ssh/**)`, `Bash(rm -rf *)`
-
-**Rule evaluation order:** Deny → Ask → Allow (first match wins; deny always takes precedence).
+14. **Permission note (observe only).** You may mention which commands or tools prompted for permission often during the session — patterns, not every individual approval. That is the whole step:
+    - **Never edit, open or print any settings file** (`.claude/settings.json`, `.claude/settings.local.json`, `~/.claude/settings.json`, or any other), and never add, change or remove a permission rule yourself — not even when the user approves.
+    - If the user wants a lasting rule, tell them to add **one exact rule themselves** through Claude Code's built-in `/permissions` screen, naming the specific command that kept prompting.
+    - Warn against broad wildcard rules (a bare `Bash`, `Read`, `Edit`, `Write` or `WebFetch`, `mcp__server__*`, or a pattern like `Bash(git *)`): they approve far more than the one command that prompted — file deletion, network access, reading secrets, sending messages.
+    - Prompts are a safety check, not friction to remove. Saying nothing here is fine.
 
 ## Governance
 

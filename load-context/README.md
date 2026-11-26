@@ -1,15 +1,17 @@
-# extract
+# load-context
 
-> Smart-fetch and extract structured value from any vault note or URL — standalone content extraction following the Content Extraction convention. Supports single note, URL, and batch folder modes.
+> Estimate context window usage, list the session's topics, and say whether to compact
 
-**Version:** 0.0.1
+**Version:** 0.0.3
+
+Renamed from `context` in v1.0.1: that name collided with Claude Code's built-in `/context` command, which shows exact token usage. This skill gives a quick estimate plus a summary of what the session covered.
 
 ## Installation
 
 This skill ships as part of **cc-starter-pack**. Install the pack, not the skill:
 
 ```bash
-git clone --depth 1 --branch v1.0.0 https://github.com/AI-Acceleration/cc-starter-pack.git
+git clone --depth 1 --branch v1.0.1 https://github.com/AI-Acceleration/cc-starter-pack.git
 cd cc-starter-pack
 ./install.sh
 ```
@@ -21,7 +23,7 @@ cd cc-starter-pack
 Invoke in Claude Code:
 
 ```
-/extract note filename, URL, folder path, or 'batch' for INBOX
+/load-context
 ```
 
 ## Files

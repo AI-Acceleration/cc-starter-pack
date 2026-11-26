@@ -8,7 +8,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET="$HOME/.claude/skills"
 mkdir -p "$TARGET"
-SKILLS="session-close context permissions retro extract skill-create project-create deep-research deep-planning fermi-decomposition inbox-clear"
+SKILLS="session-close load-context retro skill-create project-create deep-research deep-planning fermi-decomposition inbox-clear"
+# Removed or renamed in v1.0.1. Never deleted automatically; the user is told and decides.
+RETIRED="context permissions extract"
 MODE="${1:-copy}"
 for s in $SKILLS; do
   if [[ -e "$TARGET/$s" && "$MODE" != "force" ]]; then
@@ -24,6 +26,11 @@ for s in $SKILLS; do
     echo "copied: $TARGET/$s"
   fi
 done
+for s in $RETIRED; do
+  if [[ -e "$TARGET/$s" ]]; then
+    echo "NOTE: $TARGET/$s may be left over from cc-starter-pack v1.0.0; the pack no longer ships it (see CHANGELOG.md). Remove it yourself if you no longer want it."
+  fi
+done
 echo ""
 echo "Done. Restart Claude Code to pick up the skills."
-echo "Then try: /project-create, /deep-planning — they're now available."
+echo "Then try: /load-context, /project-create, /deep-planning — they're now available."
