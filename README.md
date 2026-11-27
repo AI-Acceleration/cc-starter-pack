@@ -33,7 +33,7 @@ Every `SKILL.md` in this repo declares its dependencies per the [Skill Dependenc
 ### Option A — Copy (recommended)
 
 ```bash
-git clone --depth 1 --branch v1.0.1 https://github.com/AI-Acceleration/cc-starter-pack.git
+git clone --depth 1 --branch v1.0.2 https://github.com/AI-Acceleration/cc-starter-pack.git
 cd cc-starter-pack
 ./install.sh
 ```

@@ -2,6 +2,15 @@
 
 Each version ships as a git tag. Tags are never moved or re-pointed.
 
+## v1.0.2
+
+### Changed
+
+- **`project-create`** (port of canonical 0.5.8): the Phase 2 activation block written into a new draft brief is now a real Continuation Prompt, in the same Date · Mode · Context · Resume from · Key decisions · Blockers · Files touched fields `session-close` writes, with no fenced prompt inside it. The draft carries the Next Action `Review and commit this draft brief (/project-create Phase 2)`, which the prompt names. On commit (Step 6d) that task is checked off and the block is replaced with a **filled** Continuation Prompt whose "Resume from" copies the first open Next Action, instead of an empty template. The leftover-text check (6d step 4b) keeps its two checks, which catch leftovers of both the old and the new block.
+- READMEs: install examples updated to `v1.0.2`.
+
+A plain `./install.sh` skips skills you already have: run `./install.sh force` to pick up the updated `project-create`.
+
 ## v1.0.1
 
 Safety release. The pack now never edits, opens or prints Claude Code settings files, never adds permission rules, never reads credentials, and never tells Claude to skip permission prompts.
