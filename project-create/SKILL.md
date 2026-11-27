@@ -1,11 +1,11 @@
 ---
 name: project-create
-version: "0.4.1"
+version: "0.4.2"
 description: Creates a Project or Program brief through research, an overlap check against existing briefs, scoping Q&A and the brief template, then files a project in its own folder after review. Use when asked to start, create, scope or set up a project or program, or turn an idea or Inbox note into a brief. Takes a note path, Inbox title or topic.
 user-invocable: true
 argument-hint: "note path, note title in INBOX, or topic description"
 ---
-<!-- ported-from: project-create@0.5.4 sha256:d0ac6642db0a -->
+<!-- ported-from: project-create@0.5.8 sha256:db6a2c31263f -->
 
 Create a Project Brief or Program Brief through a structured interactive process — research the input, run a guided Q&A to scope the initiative, decide project vs. program, apply the correct template, link to relevant vault notes and external references, and deliver for review.
 
@@ -157,7 +157,7 @@ Present the recommendation with reasoning. Let the user decide.
 
 ### Step 4: Build the Draft Brief
 
-Apply the correct template based on the decision. For **Projects**, the Continuation Prompt section is populated with the Phase 2 activation text (see 4a below) instead of the standard empty handoff template.
+Apply the correct template based on the decision. For **Projects**, the Continuation Prompt section is populated with the Phase 2 activation text (see 4a below) instead of the standard handoff Continuation Prompt.
 
 **For Projects** — use the Project Brief Template structure:
 ```
@@ -205,7 +205,9 @@ H2 Log
 
 **4a — Phase 2 Activation block (Projects only)**
 
-For projects, place a `### Continuation Prompt` subsection at the **top of the `## Next Actions` section** — never a standalone `## Continuation Prompt` H2 — and populate it with this activation text (substitute `<Brief Name>` with the actual filename stem). The concrete Next Action items follow the block, still under `## Next Actions`. Do **not** use the standard empty handoff template — that is only restored after Phase 2 finalizes in Step 6.
+For projects, place a `### Continuation Prompt` subsection at the **top of the `## Next Actions` section** — never a standalone `## Continuation Prompt` H2 — and populate it with this activation text (substitute `<Brief Name>` with the actual filename stem). The concrete Next Action items follow the block, still under `## Next Actions`. Do **not** use the standard handoff Continuation Prompt — that is only written, filled, after Phase 2 finalizes in Step 6 (6d step 4).
+
+**The activation block is a real Continuation Prompt.** It is one blockquote with the same fields `/session-close` writes (Date · Mode · Context · Resume from · Key decisions this session · Blockers/open questions · Files touched), with no fenced code block or nested quote inside it, so anything that reads a Continuation Prompt reads this one, and a later `/session-close` replaces it cleanly. The draft also carries the Next Action `Review and commit this draft brief (/project-create Phase 2)`, and **Resume from** names it, so the prompt always points at an open task. The Phase 2 procedure lives in Step 6, not in the prompt. *Why: the previous block (a `Status:` paragraph plus a fenced prompt) was not a Continuation Prompt in the shape the rest of the pack reads, and a replacement that stopped at its first fence left the old prompt behind.*
 
 > **Measured values come from the system of record, never from the brief.** If the text you write here states a count, status or roster whose truth lives in an external Sheet, database or API, re-read that source first and name it. The brief, its `## Log` and any earlier Continuation Prompt are all *copies*, and they go stale the moment the last sync ran.
 
@@ -214,29 +216,17 @@ For projects, place a `### Continuation Prompt` subsection at the **top of the `
 
 ### Continuation Prompt
 
-> **Status: DRAFT — Phase 2 pending**
-> **Created by:** `/project-create`
-> **Phase 1 complete:** research, scoping Q&A, and draft brief written.
+> **Date:** <today, YYYY-MM-DD>
+> **Mode:** DRAFT — Phase 2 pending · `/project-create` Step 6
+> **Context:** Phase 1 of `/project-create` (research, overlap check, scoping Q&A, draft) is done for [[<Brief Name>]]; nothing is filed or committed until Phase 2 runs.
 >
-> **To activate Phase 2, paste the following to Claude Code:**
->
-> ```
-> Resume /project-create Phase 2 for [[<Brief Name>]].
->
-> 1. Read the current draft brief.
-> 2. Present a concise summary of each H2 section and ask me:
->    "Is there anything else about this project brief you'd like to edit or brainstorm before committing?"
-> 3. If I want to iterate — help me revise sections in place (surgical edits on the draft file).
->    Loop the question until I explicitly confirm the final version.
-> 4. When I confirm:
->    a. Ask me for the final status via AskUserQuestion — choices: `active` | `incubating`.
->    b. Create the folder `Projects/<Brief Name>/` (exact filename stem, no extension).
->    c. Move the brief from `Inbox/` into that folder.
->    d. Update the `status:` frontmatter field to my choice.
->    e. Replace this Continuation Prompt block with the standard empty handoff template.
->    f. Run the Cross-Link Scan (Step 7 of the `/project-create` skill).
-> 5. Report final location, status, and cross-links applied.
-> ```
+> **Resume from:** Review and commit this draft brief (/project-create Phase 2). Resume /project-create Phase 2 for [[<Brief Name>]]: run Step 6 in order — summarize each H2 and ask «anything else to edit or brainstorm before committing?» until I confirm → status `active` | `incubating` → create `Projects/<Brief Name>/` and move the brief into it (6d) → replace this block (6d steps 4–4b) → Step 7 cross-links.
+> **Key decisions this session:** <the Step 1.5 routing choice and the Step 3 project-vs-program call>
+> **Blockers/open questions:** none; waiting on my review of the draft
+> **Files touched:** `Inbox/<Brief Name>.md`
+
+- [ ] Review and commit this draft brief (/project-create Phase 2)
+- [ ] <first concrete Next Action>
 ```
 
 While in DRAFT state, set `status: incubating` in frontmatter as a safe default — it will be overwritten in Step 6.
@@ -304,20 +294,21 @@ Execute in order:
 1. Create the folder `Projects/<Brief Name>/` (use the exact filename stem, no `.md` extension).
 2. Move the brief file from `Inbox/<Brief Name>.md` to `Projects/<Brief Name>/<Brief Name>.md` (prefer `mv` via Bash to preserve timestamps).
 3. Update the `status:` frontmatter field in the moved file to the user's choice (`active` or `incubating`).
-4. Replace the Phase 2 activation Continuation Prompt block (the `### Continuation Prompt` subsection at the top of `## Next Actions`) with the standard empty handoff template — keep it as `### Continuation Prompt` under `## Next Actions`, never a standalone `## Continuation Prompt` H2:
+4. Check off the Next Action `Review and commit this draft brief (/project-create Phase 2)` and remove it from Next Actions (step 5's Log row records it), then replace the Phase 2 activation Continuation Prompt block (the `### Continuation Prompt` subsection at the top of `## Next Actions`) with a **filled** handoff prompt — keep it as `### Continuation Prompt` under `## Next Actions`, never a standalone `## Continuation Prompt` H2. **Resume from** copies, word for word, the first open Next Action:
    ```markdown
    ### Continuation Prompt
 
-   > **Date:**
-   > **Mode:**
-   > **Context:**
+   > **Date:** <today, YYYY-MM-DD>
+   > **Mode:** <Vault Management or Programming Projects> · <skill or workflow the next step runs>
+   > **Context:** committed via /project-create on <today> (status: <active|incubating>), filed at `Projects/<Brief Name>/<Brief Name>.md`
    >
-   > **Resume from:**
-   > **Key decisions this session:**
-   > **Blockers/open questions:**
-   > **Files touched:**
+   > **Resume from:** <first open Next Action, copied verbatim>
+   > **Key decisions this session:** <the routing, classification and status choices made in this run>
+   > **Blockers/open questions:** <none, or the open Waiting For item it depends on>
+   > **Files touched:** [[<Brief Name>]]
    ```
-4b. **Check the activation text is gone before moving on.** The Phase 2 block is a `>`-quoted paragraph *plus* a fenced code block, so a replacement that stops at the first fence leaves the whole `Resume /project-create Phase 2 …` prompt sitting under the new empty template. After step 4, `grep -c "Resume /project-create\|Phase 2 pending" "<brief>"` must return **0**, and `grep -c "^> \*\*Date:\*\*" "<brief>"` must return **1**. If either is off, fix the section before continuing.
+   *Why filled, not the empty template: a committed brief with an empty prompt gives the next session nothing to resume from until a later `/session-close` fills it.*
+4b. **Check the activation text is gone before moving on.** A partial replacement leaves the `Resume /project-create Phase 2 …` text sitting under the new prompt. In drafts written before this version the activation block is a `>`-quoted paragraph *plus* a fenced code block, whose leftover text carries no `**Date:**` line; since this version the block is a full Continuation Prompt with its own `**Date:**` line, so leftover text shows up as a second Date line. The same two checks catch both shapes. After step 4, `grep -c "Resume /project-create\|Phase 2 pending" "<brief>"` must return **0**, and `grep -c "^> \*\*Date:\*\*" "<brief>"` must return **1**. If either is off, fix the section before continuing.
 5. Add a Log entry for commit: `| <today> | Milestone | Project created and committed via /project-create (status: <active|incubating>) |`
 
 **6e — Confirm commit**
